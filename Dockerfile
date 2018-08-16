@@ -3,6 +3,14 @@ FROM gluehome/nrf52-toolchain:2017q2
 # Install Jumper - Virtual nRF52 device support - https://jumper.io/
 RUN pip install jumper
 
+# Get a protoc3 compiler
+WORKDIR /opt
+RUN wget -qO protoc3.zip https://github.com/google/protobuf/releases/download/v3.6.1/protoc-3.6.1-linux-x86_64.zip && \
+    unzip protoc3.zip -d protoc3 && \
+    rm protoc3.zip && \
+    mv protoc3/bin/* /usr/local/bin/ && \
+    mv protoc3/include/* /usr/local/include/
+
 # Common Libraries
 # LibSodium and nanopb
 WORKDIR /src
@@ -15,6 +23,10 @@ RUN cp -r /src/nanopb .
 
 WORKDIR /opt/amd64
 RUN cp -r /src/nanopb .
+
+# Generate protocol definitions for nanopb generator
+WORKDIR /opt/cortexm/nanopb/generator/proto
+RUN make
 
 WORKDIR /src/libsodium
 # Compile lib sodium for host
@@ -39,4 +51,8 @@ ENV AMD64_ROOT=/opt/amd64 \
     LDFLAGS="" \
     CFLAGS=""
 
+# Install ceedling for unit testing
+RUN apt-get install ruby-full -y && \
+    gem install ceedling
+    
 WORKDIR /build
