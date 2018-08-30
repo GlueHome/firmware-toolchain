@@ -50,7 +50,7 @@ ENV LIBSODIUM_CORTEXM_LIB_PATH=/opt/libsodium/lib/cortexm \
     LIBSODIUM_AMD64_LIB_PATH=/opt/libsodium/lib/amd64 \
     LIBSODIUM_INC_PATH==/opt/libsodium/include \
     NANOPB_PATH=/opt/nanopb \
-    LD_LIBRARY_PATH=/opt/libsodium/lib/amd64:${LD_LIBRARY_PATH}\
+    LD_LIBRARY_PATH=/opt/libsodium/lib/amd64:${LD_LIBRARY_PATH} \
     LDFLAGS="" \
     CFLAGS=""
     
