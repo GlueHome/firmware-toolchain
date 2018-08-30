@@ -8,8 +8,10 @@ RUN apt-get update && apt-get install -y \
     autoconf \
     && apt-get purge
 
+# Needed for unit testing
 RUN gem install ceedling
 
+# Needed for compiling .proto files
 RUN wget -qO protoc3.zip https://github.com/google/protobuf/releases/download/v3.6.1/protoc-3.6.1-linux-x86_64.zip && \
     unzip protoc3.zip -d protoc3 && \
     rm protoc3.zip && \
@@ -19,15 +21,16 @@ RUN wget -qO protoc3.zip https://github.com/google/protobuf/releases/download/v3
 RUN git clone https://github.com/GlueHome/libsodium && \
     git clone https://github.com/GlueHome/nanopb
 
+# Needed for compiling .proto files for C
 WORKDIR /opt/nanopb/generator/proto
 RUN make
 
+# Compile libsodium for host
 WORKDIR /opt/libsodium
-
-# Compile lib sodium for host
 RUN ./autogen.sh \
-    && mkdir -p /opt/libsodium/amd64 \
-    &&  ./configure --prefix=/opt/libsodium/amd64 \
+    && mkdir -p /opt/libsodium/include \
+    && mkdir -p /opt/libsodium/lib/amd64 \
+    &&  ./configure --libdir=/opt/libsodium/lib/amd64 --includedir=/opt/libsodium/include \
     && make \
     && make check \
     && make install
@@ -35,19 +38,19 @@ RUN ./autogen.sh \
 ENV LDFLAGS="-mthumb -mabi=aapcs -mfloat-abi=soft --specs=nosys.specs" \
     CFLAGS="-mcpu=cortex-m4 -mthumb -mabi=aapcs -mfloat-abi=soft -ffunction-sections -fdata-sections -fno-strict-aliasing -Os"
 
-# Compile lib sodium for firmware
-RUN mkdir -p /opt/libsodium/cortexm \
+# Compile libsodium for firmware
+RUN mkdir -p /opt/libsodium/lib/cortexm \
+    && mkdir -p /opt/libsodium/include \
     && make clean \
-    && ./configure --host=arm-none-eabi --prefix=/opt/libsodium/cortexm \
+    && ./configure --host=arm-none-eabi --libdir=/opt/libsodium/lib/cortexm --includedir=/opt/libsodium/include \
     && make \
     && make install
 
-ENV LIBSODIUM_CORTEXM_LIB_PATH=/opt/libsodium/cortexm/lib \
-    LIBSODIUM_CORTEXM_INC_PATH==/opt/libsodium/cortexm/include \
-    LIBSODIUM_AMD64_LIB_PATH=/opt/libsodium/amd64/lib \
-    LIBSODIUM_AMD64_INC_PATH==/opt/libsodium/amd64/include \
+ENV LIBSODIUM_CORTEXM_LIB_PATH=/opt/libsodium/lib/cortexm \
+    LIBSODIUM_AMD64_LIB_PATH=/opt/libsodium/lib/amd64 \
+    LIBSODIUM_INC_PATH==/opt/libsodium/include \
     NANOPB_PATH=/opt/nanopb \
-    LD_LIBRARY_PATH=/opt/libsodium/amd64/lib:${LD_LIBRARY_PATH}\
+    LD_LIBRARY_PATH=/opt/libsodium/lib/amd64:${LD_LIBRARY_PATH}\
     LDFLAGS="" \
     CFLAGS=""
     
