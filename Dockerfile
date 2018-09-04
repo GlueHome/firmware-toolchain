@@ -48,7 +48,7 @@ RUN mkdir -p /opt/libsodium/lib/cortexm \
 
 ENV LIBSODIUM_CORTEXM_LIB_PATH=/opt/libsodium/lib/cortexm \
     LIBSODIUM_AMD64_LIB_PATH=/opt/libsodium/lib/amd64 \
-    LIBSODIUM_INC_PATH==/opt/libsodium/include \
+    LIBSODIUM_INCLUDE_PATH=/opt/libsodium/include \
     NANOPB_PATH=/opt/nanopb \
     LD_LIBRARY_PATH=/opt/libsodium/lib/amd64:${LD_LIBRARY_PATH} \
     LDFLAGS="" \
