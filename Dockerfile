@@ -46,12 +46,16 @@ RUN mkdir -p /opt/libsodium/lib/cortexm \
     && make \
     && make install
 
+COPY ./make_library /opt/make_library
+
 ENV LIBSODIUM_CORTEXM_LIB_PATH=/opt/libsodium/lib/cortexm \
     LIBSODIUM_AMD64_LIB_PATH=/opt/libsodium/lib/amd64 \
     LIBSODIUM_INCLUDE_PATH=/opt/libsodium/include \
     NANOPB_PATH=/opt/nanopb \
     LD_LIBRARY_PATH=/opt/libsodium/lib/amd64:${LD_LIBRARY_PATH} \
     LDFLAGS="" \
-    CFLAGS=""
-    
-WORKDIR /opt
+    CFLAGS="" \
+    MAKE_LIBRARY_PATH=/opt/make_library
+
+WORKDIR /opt/
+
